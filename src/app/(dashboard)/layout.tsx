@@ -5,6 +5,7 @@ import { createTheme } from "@mui/material/styles";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import { NextAppProvider } from "@toolpad/core/nextjs";
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
+import Image from "next/image";
 // import { PageContainer } from "@toolpad/core/PageContainer";
 
 const NAVIGATION = [
@@ -40,9 +41,16 @@ export default function DashboardLayoutBranding({
     <NextAppProvider
       navigation={NAVIGATION}
       branding={{
-        logo: <img src="https://mui.com/static/logo.png" alt="MUI logo" />,
+        logo: (
+          <Image
+            src="https://mui.com/static/logo.png"
+            width={40}
+            height={40}
+            alt="MUI logo"
+          />
+        ),
         title: "MUI",
-        homeUrl: "/admin/posts",
+        homeUrl: "/admin",
       }}
       theme={adminTheme}
     >

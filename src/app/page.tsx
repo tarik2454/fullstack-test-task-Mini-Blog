@@ -31,6 +31,7 @@ export default function Home() {
         >
           View the API call
         </Link>
+        <Link href="/blog">Blog</Link>
       </div>
     </section>
   );
