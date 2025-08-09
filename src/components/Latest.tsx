@@ -190,7 +190,7 @@ export function Latest() {
 
   return (
     <div>
-      <Typography variant="h2" gutterBottom>
+      <Typography variant="h2" gutterBottom sx={{ fontSize: 40 }}>
         Latest
       </Typography>
       <Grid container spacing={8} columns={12} sx={{ my: 4 }}>

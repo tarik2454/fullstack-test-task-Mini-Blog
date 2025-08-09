@@ -46,7 +46,7 @@ export function Header() {
         boxShadow: 0,
         bgcolor: "transparent",
         backgroundImage: "none",
-        mt: "calc(var(--template-frame-height, 0px) + 18px)",
+        mt: "calc(var(--template-frame-height, 0px) + 16px)",
       }}
     >
       <Container maxWidth="lg">
