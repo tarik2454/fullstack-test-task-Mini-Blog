@@ -6,14 +6,14 @@ import Box from "@mui/material/Box";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
 import Container from "@mui/material/Container";
-import Divider from "@mui/material/Divider";
-import MenuItem from "@mui/material/MenuItem";
-import Drawer from "@mui/material/Drawer";
-import MenuIcon from "@mui/icons-material/Menu";
-import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { SitemarkIcon } from "./SitemarkIcon";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import TextField from "@mui/material/TextField";
+import { TextareaAutosize } from "@mui/material";
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: "flex",
@@ -32,121 +32,122 @@ const StyledToolbar = styled(Toolbar)(({ theme }) => ({
 }));
 
 export function Header() {
-  const [open, setOpen] = React.useState(false);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
 
-  const toggleDrawer = (newOpen: boolean) => () => {
-    setOpen(newOpen);
+  const [formData, setFormData] = React.useState({
+    title: "",
+    content: "",
+    authorName: "",
+    published: false,
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = () => {
+    console.log("Creating post:", formData);
+    setDialogOpen(false);
+    setFormData({
+      title: "",
+      content: "",
+      authorName: "",
+      published: false,
+    });
   };
 
   return (
-    <AppBar
-      position="fixed"
-      enableColorOnDark
-      sx={{
-        boxShadow: 0,
-        bgcolor: "transparent",
-        backgroundImage: "none",
-        mt: "calc(var(--template-frame-height, 0px) + 16px)",
-      }}
-    >
-      <Container maxWidth="lg">
-        <StyledToolbar variant="dense" disableGutters>
-          <Box
-            sx={{ flexGrow: 1, display: "flex", alignItems: "center", px: 0 }}
-          >
-            <SitemarkIcon />
-            <Box sx={{ display: { xs: "none", md: "flex" } }}>
-              <Button variant="text" color="info" size="small">
-                Features
-              </Button>
-              <Button variant="text" color="info" size="small">
-                Testimonials
-              </Button>
-              <Button variant="text" color="info" size="small">
-                Highlights
-              </Button>
-              <Button variant="text" color="info" size="small">
-                Pricing
-              </Button>
-              <Button
-                variant="text"
-                color="info"
-                size="small"
-                sx={{ minWidth: 0 }}
-              >
-                FAQ
-              </Button>
-              <Button
-                variant="text"
-                color="info"
-                size="small"
-                sx={{ minWidth: 0 }}
-              >
-                Blog
-              </Button>
+    <>
+      <AppBar
+        position="fixed"
+        enableColorOnDark
+        sx={{
+          boxShadow: 0,
+          bgcolor: "transparent",
+          backgroundImage: "none",
+          mt: "calc(var(--template-frame-height, 0px) + 16px)",
+        }}
+      >
+        <Container maxWidth="lg">
+          <StyledToolbar variant="dense" disableGutters>
+            <Box
+              sx={{ flexGrow: 1, display: "flex", alignItems: "center", px: 0 }}
+            >
+              <SitemarkIcon />
             </Box>
-          </Box>
-          <Box
-            sx={{
-              display: { xs: "none", md: "flex" },
-              gap: 1,
-              alignItems: "center",
-            }}
-          >
-            <Button color="primary" variant="text" size="small">
-              Sign in
-            </Button>
-            <Button color="primary" variant="contained" size="small">
-              Sign up
-            </Button>
-          </Box>
-          <Box sx={{ display: { xs: "flex", md: "none" }, gap: 1 }}>
-            <IconButton aria-label="Menu button" onClick={toggleDrawer(true)}>
-              <MenuIcon />
-            </IconButton>
-            <Drawer
-              anchor="top"
-              open={open}
-              onClose={toggleDrawer(false)}
-              PaperProps={{
-                sx: {
-                  top: "var(--template-frame-height, 0px)",
-                },
+            <Box
+              sx={{
+                gap: 1,
+                alignItems: "center",
               }}
             >
-              <Box sx={{ p: 2, backgroundColor: "background.default" }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                  }}
-                >
-                  <IconButton onClick={toggleDrawer(false)}>
-                    <CloseRoundedIcon />
-                  </IconButton>
-                </Box>
-                <MenuItem>Features</MenuItem>
-                <MenuItem>Testimonials</MenuItem>
-                <MenuItem>Highlights</MenuItem>
-                <MenuItem>Pricing</MenuItem>
-                <MenuItem>FAQ</MenuItem>
-                <MenuItem>Blog</MenuItem>
-                <Divider sx={{ my: 3 }} />
-                <MenuItem>
-                  <Button color="primary" variant="contained" fullWidth>
-                    Sign up
-                  </Button>
-                </MenuItem>
-                <MenuItem>
-                  <Button color="primary" variant="outlined" fullWidth>
-                    Sign in
-                  </Button>
-                </MenuItem>
-              </Box>
-            </Drawer>
-          </Box>
-        </StyledToolbar>
-      </Container>
-    </AppBar>
+              <Button
+                variant="text"
+                color="info"
+                size="small"
+                onClick={() => setDialogOpen(true)}
+              >
+                Create new post
+              </Button>
+            </Box>
+          </StyledToolbar>
+        </Container>
+      </AppBar>
+
+      <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Create new post</DialogTitle>
+        <DialogContent
+          sx={{ display: "flex", flexDirection: "column", gap: 2, mb: 1 }}
+        >
+          <TextField
+            label="Title"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            fullWidth
+            sx={{ mt: 1 }}
+          />
+          <TextareaAutosize
+            minRows={4}
+            style={{
+              width: "100%",
+              padding: "8px",
+              fontSize: "16px",
+              borderRadius: "4px",
+              border: "1px solid #ccc",
+              resize: "vertical",
+            }}
+            value={formData.content}
+            name="content"
+            onChange={handleChange}
+            placeholder="Post text..."
+          />
+          <TextField
+            label="Author name"
+            name="authorName"
+            value={formData.authorName}
+            onChange={handleChange}
+            fullWidth
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+          <Button variant="contained" onClick={handleSubmit}>
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }

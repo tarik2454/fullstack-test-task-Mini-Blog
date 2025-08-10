@@ -6,8 +6,20 @@
     --font-sans: var(--roboto);
 
     --color-background: #ffffff;
-    --color-foreground: #171717;
-    --color-mint-500: oklch(0.72 0.11 178);
+    --color-title: #000000;
+    --color-text: #333333;
+    --color-border: #dddddd;
+    --color-white: #ffffff;
+    --color-black: #ffffff;
+    --color-current: currentColor;
+    --color-transparent: transparent;
+  }
+
+  .mui-2sokba {
+    background-color: var(--color-gray-50) !important;
+  }
+  .mui-gr4hu4-MuiPaper-root-MuiAppBar-root {
+    background-color: var(--color-gray-50) !important;
   }
 }
 
@@ -23,8 +35,4 @@
   h1 {
     font-size: 50px !important;
   }
-
-  /* h2 {
-  font-size: 40px !important;
-} */
 }

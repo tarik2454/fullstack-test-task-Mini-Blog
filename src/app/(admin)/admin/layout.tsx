@@ -6,6 +6,7 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import { NextAppProvider } from "@toolpad/core/nextjs";
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import Image from "next/image";
+import { redirect } from "next/navigation";
 // import { PageContainer } from "@toolpad/core/PageContainer";
 
 const NAVIGATION = [
@@ -32,11 +33,24 @@ const adminTheme = createTheme({
   },
 });
 
+async function checkAuth() {
+  // здесь можно проверить cookie, сессию или вызвать API
+  // верни true, если авторизован, иначе false
+  // для демо — всегда false
+  return false;
+}
+
 export default function DashboardLayoutBranding({
   children,
 }: {
   children: ReactNode;
 }) {
+  const isAuth = checkAuth();
+
+  if (!isAuth) {
+    redirect("/sign-in");
+  }
+
   return (
     <NextAppProvider
       navigation={NAVIGATION}

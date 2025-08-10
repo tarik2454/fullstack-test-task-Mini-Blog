@@ -12,6 +12,7 @@
     "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@hookform/resolvers": "^5.2.1",
     "@mui/icons-material": "^7.2.0",
     "@mui/material": "^7.2.0",
     "@mui/material-nextjs": "^7.3.0",
@@ -25,7 +26,8 @@
     "postgres": "^3.4.7",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "zod": "^4.0.16"
+    "react-hook-form": "^7.62.0",
+    "zod": "^4.0.17"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
