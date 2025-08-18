@@ -67,7 +67,10 @@ export function Footer() {
             }}
           >
             <Box sx={{ width: { xs: "100%", sm: "60%" } }}>
-              <SitemarkIcon />
+              <Link href="/">
+                <SitemarkIcon />
+              </Link>
+
               <Typography
                 variant="body2"
                 gutterBottom

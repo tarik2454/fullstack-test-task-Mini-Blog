@@ -114,8 +114,9 @@ export default function MainPage() {
                       },
                     }}
                   >
+                 
                     <MenuItem value="Published">Published</MenuItem>
-                    <MenuItem value="Draft">Draft</MenuItem>
+                    <MenuItem value="Draft">Draft </MenuItem>
                   </Select>
                 </TableCell>
               </TableRow>

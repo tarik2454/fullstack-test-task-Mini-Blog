@@ -14,6 +14,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField";
 import { TextareaAutosize } from "@mui/material";
+import Link from "next/link";
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: "flex",
@@ -79,7 +80,9 @@ export function Header() {
             <Box
               sx={{ flexGrow: 1, display: "flex", alignItems: "center", px: 0 }}
             >
-              <SitemarkIcon />
+              <Link href="/">
+                <SitemarkIcon />
+              </Link>
             </Box>
             <Box
               sx={{

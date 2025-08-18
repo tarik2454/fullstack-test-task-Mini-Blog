@@ -1,8 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Avatar from "@mui/material/Avatar";
-import AvatarGroup from "@mui/material/AvatarGroup";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -21,57 +19,45 @@ import RssFeedRoundedIcon from "@mui/icons-material/RssFeedRounded";
 const cardData = [
   {
     img: "https://picsum.photos/800/450?random=1",
-    tag: "Engineering",
     title: "Revolutionizing software development with cutting-edge tools",
-    description:
+    content:
       "Our latest engineering tools are designed to streamline workflows and boost productivity. Discover how these innovations are transforming the software development landscape.",
-    authors: [
-      { name: "Remy Sharp", avatar: "/static/images/avatar/1.jpg" },
-      { name: "Travis Howard", avatar: "/static/images/avatar/2.jpg" },
-    ],
+    authorName: "Remy Sharp",
   },
   {
     img: "https://picsum.photos/800/450?random=2",
-    tag: "Product",
     title: "Innovative product features that drive success",
-    description:
+    content:
       "Explore the key features of our latest product release that are helping businesses achieve their goals. From user-friendly interfaces to robust functionality, learn why our product stands out.",
-    authors: [{ name: "Erica Johns", avatar: "/static/images/avatar/6.jpg" }],
+    authorName: "Erica Johns",
   },
   {
     img: "https://picsum.photos/800/450?random=3",
-    tag: "Design",
     title: "Designing for the future: trends and insights",
     description:
       "Stay ahead of the curve with the latest design trends and insights. Our design team shares their expertise on creating intuitive and visually stunning user experiences.",
-    authors: [{ name: "Kate Morrison", avatar: "/static/images/avatar/7.jpg" }],
+    authorName: "Kate Morrison",
   },
   {
     img: "https://picsum.photos/800/450?random=4",
-    tag: "Company",
     title: "Our company's journey: milestones and achievements",
     description:
       "Take a look at our company's journey and the milestones we've achieved along the way. From humble beginnings to industry leader, discover our story of growth and success.",
-    authors: [{ name: "Cindy Baker", avatar: "/static/images/avatar/3.jpg" }],
+    authorName: "Cindy Baker",
   },
   {
     img: "https://picsum.photos/800/450?random=45",
-    tag: "Engineering",
     title: "Pioneering sustainable engineering solutions",
     description:
       "Learn about our commitment to sustainability and the innovative engineering solutions we're implementing to create a greener future. Discover the impact of our eco-friendly initiatives.",
-    authors: [
-      { name: "Agnes Walker", avatar: "/static/images/avatar/4.jpg" },
-      { name: "Trevor Henderson", avatar: "/static/images/avatar/5.jpg" },
-    ],
+    authorName: "Agnes Walker",
   },
   {
     img: "https://picsum.photos/800/450?random=6",
-    tag: "Product",
     title: "Maximizing efficiency with our latest product updates",
     description:
       "Our recent product updates are designed to help you maximize efficiency and achieve more. Get a detailed overview of the new features and improvements that can elevate your workflow.",
-    authors: [{ name: "Travis Howard", avatar: "/static/images/avatar/2.jpg" }],
+    authorName: "Travis Howard",
   },
 ];
 
@@ -111,7 +97,7 @@ const StyledTypography = styled(Typography)({
   textOverflow: "ellipsis",
 });
 
-function Author({ authors }: { authors: { name: string; avatar: string }[] }) {
+function Author({ authorName }: { authorName: string }) {
   return (
     <Box
       sx={{
@@ -131,19 +117,7 @@ function Author({ authors }: { authors: { name: string; avatar: string }[] }) {
           alignItems: "center",
         }}
       >
-        <AvatarGroup max={3}>
-          {authors.map((author, index) => (
-            <Avatar
-              key={index}
-              alt={author.name}
-              src={author.avatar}
-              sx={{ width: 24, height: 24 }}
-            />
-          ))}
-        </AvatarGroup>
-        <Typography variant="caption">
-          {authors.map((author) => author.name).join(", ")}
-        </Typography>
+        <Typography variant="caption">{authorName}</Typography>
       </Box>
       <Typography variant="caption">July 14, 2021</Typography>
     </Box>
@@ -308,9 +282,6 @@ export function Blog() {
               }}
             />
             <SyledCardContent>
-              <Typography gutterBottom variant="caption" component="div">
-                {cardData[0].tag}
-              </Typography>
               <Typography gutterBottom variant="h6" component="div">
                 {cardData[0].title}
               </Typography>
@@ -322,7 +293,7 @@ export function Blog() {
                 {cardData[0].description}
               </StyledTypography>
             </SyledCardContent>
-            <Author authors={cardData[0].authors} />
+            <Author authorName={cardData[0].authorName} />
           </SyledCard>
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
@@ -344,9 +315,6 @@ export function Blog() {
               }}
             />
             <SyledCardContent>
-              <Typography gutterBottom variant="caption" component="div">
-                {cardData[1].tag}
-              </Typography>
               <Typography gutterBottom variant="h6" component="div">
                 {cardData[1].title}
               </Typography>
@@ -358,7 +326,7 @@ export function Blog() {
                 {cardData[1].description}
               </StyledTypography>
             </SyledCardContent>
-            <Author authors={cardData[1].authors} />
+            <Author authorName={cardData[1].authorName} />
           </SyledCard>
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
@@ -380,9 +348,6 @@ export function Blog() {
               }}
             />
             <SyledCardContent>
-              <Typography gutterBottom variant="caption" component="div">
-                {cardData[2].tag}
-              </Typography>
               <Typography gutterBottom variant="h6" component="div">
                 {cardData[2].title}
               </Typography>
@@ -394,7 +359,7 @@ export function Blog() {
                 {cardData[2].description}
               </StyledTypography>
             </SyledCardContent>
-            <Author authors={cardData[2].authors} />
+            <Author authorName={cardData[2].authorName} />
           </SyledCard>
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
@@ -423,9 +388,6 @@ export function Blog() {
                 }}
               >
                 <div>
-                  <Typography gutterBottom variant="caption" component="div">
-                    {cardData[3].tag}
-                  </Typography>
                   <Typography gutterBottom variant="h6" component="div">
                     {cardData[3].title}
                   </Typography>
@@ -438,7 +400,7 @@ export function Blog() {
                   </StyledTypography>
                 </div>
               </SyledCardContent>
-              <Author authors={cardData[3].authors} />
+              <Author authorName={cardData[3].authorName} />
             </SyledCard>
             <SyledCard
               variant="outlined"
@@ -457,9 +419,6 @@ export function Blog() {
                 }}
               >
                 <div>
-                  <Typography gutterBottom variant="caption" component="div">
-                    {cardData[4].tag}
-                  </Typography>
                   <Typography gutterBottom variant="h6" component="div">
                     {cardData[4].title}
                   </Typography>
@@ -472,7 +431,7 @@ export function Blog() {
                   </StyledTypography>
                 </div>
               </SyledCardContent>
-              <Author authors={cardData[4].authors} />
+              <Author authorName={cardData[4].authorName} />
             </SyledCard>
           </Box>
         </Grid>
@@ -495,9 +454,6 @@ export function Blog() {
               }}
             />
             <SyledCardContent>
-              <Typography gutterBottom variant="caption" component="div">
-                {cardData[5].tag}
-              </Typography>
               <Typography gutterBottom variant="h6" component="div">
                 {cardData[5].title}
               </Typography>
@@ -509,7 +465,7 @@ export function Blog() {
                 {cardData[5].description}
               </StyledTypography>
             </SyledCardContent>
-            <Author authors={cardData[5].authors} />
+            <Author authorName={cardData[5].authorName} />
           </SyledCard>
         </Grid>
       </Grid>
