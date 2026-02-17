@@ -1,77 +1,22 @@
 "use client";
 
-import * as React from "react";
+import { useState } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Pagination from "@mui/material/Pagination";
 import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
 import NavigateNextRoundedIcon from "@mui/icons-material/NavigateNextRounded";
+import Link from "next/link";
+import type { PostResponseDTO } from "@/api/posts";
 
-const articleInfo = [
-  {
-    title: "The future of AI in software engineering",
-    content:
-      "Artificial intelligence is revolutionizing software engineering. Explore how AI-driven tools are enhancing development processes and improving software quality.",
-    authorName: "Travis Howard",
-  },
-  {
-    title: "Driving growth with user-centric product design",
-    content:
-      "Our user-centric product design approach is driving significant growth. Learn about the strategies we employ to create products that resonate with users.",
-    authorName: "Erica Johns",
-  },
-  {
-    title: "Embracing minimalism in modern design",
-    description:
-      "Minimalism is a key trend in modern design. Discover how our design team incorporates minimalist principles to create clean and impactful user experiences.",
-    authorName: "Kate Morrison",
-  },
-  {
-    title: "Cultivating a culture of innovation",
-    description:
-      "Innovation is at the heart of our company culture. Learn about the initiatives we have in place to foster creativity and drive groundbreaking solutions.",
-    authorName: "Cindy Baker",
-  },
-  {
-    title: "Advancing cybersecurity with next-gen solutions",
-    description:
-      "Our next-generation cybersecurity solutions are setting new standards in the industry. Discover how we protect our clients from evolving cyber threats.",
-    authorName: "Agnes Walker",
-  },
-  {
-    title: "Enhancing customer experience through innovation",
-    description:
-      "Our innovative approaches are enhancing customer experience. Learn about the new features and improvements that are delighting our users.",
-    authorName: "Travis Howard",
-  },
-  {
-    title: "Pioneering sustainable engineering solutions",
-    description:
-      "Learn about our commitment to sustainability and the innovative engineering solutions we're implementing to create a greener future. Discover the impact of our eco-friendly initiatives.",
-    authorName: "Agnes Walker",
-  },
-  {
-    title: "Maximizing efficiency with our latest product updates",
-    description:
-      "Our recent product updates are designed to help you maximize efficiency and achieve more. Get a detailed overview of the new features and improvements that can elevate your workflow.",
-    authorName: "Travis Howard",
-  },
-  {
-    title: "Designing for the future: trends and insights",
-    description:
-      "Stay ahead of the curve with the latest design trends and insights. Our design team shares their expertise on creating intuitive and visually stunning user experiences.",
-    authorName: "Kate Morrison",
-  },
-  {
-    title: "Our company's journey: milestones and achievements",
-    description:
-      "Take a look at our company's journey and the milestones we've achieved along the way. From humble beginnings to industry leader, discover our story of growth and success.",
-    authorName: "Cindy Baker",
-  },
-];
+interface LatestProps {
+  posts: PostResponseDTO[];
+}
 
-const StyledTypography = styled(Typography)({
+const ITEMS_PER_PAGE = 6;
+
+const ClampedTypography = styled(Typography)({
   display: "-webkit-box",
   WebkitBoxOrient: "vertical",
   WebkitLineClamp: 2,
@@ -116,7 +61,18 @@ const TitleTypography = styled(Typography)(({ theme }) => ({
   },
 }));
 
-function Author({ authorName }: { authorName: string }) {
+interface AuthorProps {
+  authorName: string;
+  createdAt: string;
+}
+
+function Author({ authorName, createdAt }: AuthorProps): React.ReactNode {
+  const formattedDate = new Date(createdAt).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
   return (
     <Box
       sx={{
@@ -127,33 +83,40 @@ function Author({ authorName }: { authorName: string }) {
         justifyContent: "space-between",
       }}
     >
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          gap: 1,
-          alignItems: "center",
-        }}
-      >
-        <Typography variant="caption">{authorName}</Typography>
-      </Box>
-      <Typography variant="caption">July 14, 2021</Typography>
+      <Typography variant="caption">{authorName}</Typography>
+      <Typography variant="caption">{formattedDate}</Typography>
     </Box>
   );
 }
 
-export function Latest() {
-  const [focusedCardIndex, setFocusedCardIndex] = React.useState<number | null>(
-    null
+export function Latest({ posts }: LatestProps): React.ReactNode {
+  const [focusedCardIndex, setFocusedCardIndex] = useState<number | null>(null);
+  const [page, setPage] = useState<number>(1);
+
+  const totalPages = Math.max(1, Math.ceil(posts.length / ITEMS_PER_PAGE));
+  const paginatedPosts = posts.slice(
+    (page - 1) * ITEMS_PER_PAGE,
+    page * ITEMS_PER_PAGE
   );
 
-  const handleFocus = (index: number) => {
+  const handleFocus = (index: number): void => {
     setFocusedCardIndex(index);
   };
 
-  const handleBlur = () => {
+  const handleBlur = (): void => {
     setFocusedCardIndex(null);
   };
+
+  const handlePageChange = (
+    _event: React.ChangeEvent<unknown>,
+    value: number
+  ): void => {
+    setPage(value);
+  };
+
+  if (posts.length === 0) {
+    return <div />;
+  }
 
   return (
     <div>
@@ -161,8 +124,8 @@ export function Latest() {
         Latest
       </Typography>
       <Grid container spacing={8} columns={12} sx={{ my: 4 }}>
-        {articleInfo.map((article, index) => (
-          <Grid key={index} size={{ xs: 12, sm: 6 }}>
+        {paginatedPosts.map((post, index) => (
+          <Grid key={post.id} size={{ xs: 12, sm: 6 }}>
             <Box
               sx={{
                 display: "flex",
@@ -172,48 +135,53 @@ export function Latest() {
                 height: "100%",
               }}
             >
-              <TitleTypography
-                gutterBottom
-                variant="h6"
-                onFocus={() => handleFocus(index)}
-                onBlur={handleBlur}
-                tabIndex={0}
-                className={focusedCardIndex === index ? "Mui-focused" : ""}
+              <Link
+                href={`/${post.id}`}
+                style={{ color: "inherit", textDecoration: "none" }}
               >
-                {article.title}
-                <NavigateNextRoundedIcon
-                  className="arrow"
-                  sx={{ fontSize: "1rem" }}
-                />
-              </TitleTypography>
-              <StyledTypography
+                <TitleTypography
+                  gutterBottom
+                  variant="h6"
+                  onFocus={() => handleFocus(index)}
+                  onBlur={handleBlur}
+                  tabIndex={0}
+                  className={focusedCardIndex === index ? "Mui-focused" : ""}
+                >
+                  {post.title}
+                  <NavigateNextRoundedIcon
+                    className="arrow"
+                    sx={{ fontSize: "1rem" }}
+                  />
+                </TitleTypography>
+              </Link>
+              <ClampedTypography
                 variant="body2"
                 color="text.secondary"
                 gutterBottom
               >
-                {article.description}
-              </StyledTypography>
-
-              <Author authorName={article.authorName} />
+                {post.content}
+              </ClampedTypography>
+              <Author authorName={post.authorName} createdAt={post.createdAt} />
             </Box>
           </Grid>
         ))}
       </Grid>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "center",
-          pt: 4,
-        }}
-      >
-        <Pagination
-          hidePrevButton
-          hideNextButton
-          count={10}
-          boundaryCount={10}
-        />
-      </Box>
+      {totalPages > 1 && (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            pt: 4,
+          }}
+        >
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={handlePageChange}
+          />
+        </Box>
+      )}
     </div>
   );
 }

@@ -1,67 +1,26 @@
 "use client";
 
-import * as React from "react";
+import { useState } from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
-import Chip from "@mui/material/Chip";
 import Grid from "@mui/material/Grid";
-import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import FormControl from "@mui/material/FormControl";
 import InputAdornment from "@mui/material/InputAdornment";
 import OutlinedInput from "@mui/material/OutlinedInput";
+import CardActionArea from "@mui/material/CardActionArea";
 import { styled } from "@mui/material/styles";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
-import RssFeedRoundedIcon from "@mui/icons-material/RssFeedRounded";
+import Link from "next/link";
+import type { PostResponseDTO } from "@/api/posts";
 
-const cardData = [
-  {
-    img: "https://picsum.photos/800/450?random=1",
-    title: "Revolutionizing software development with cutting-edge tools",
-    content:
-      "Our latest engineering tools are designed to streamline workflows and boost productivity. Discover how these innovations are transforming the software development landscape.",
-    authorName: "Remy Sharp",
-  },
-  {
-    img: "https://picsum.photos/800/450?random=2",
-    title: "Innovative product features that drive success",
-    content:
-      "Explore the key features of our latest product release that are helping businesses achieve their goals. From user-friendly interfaces to robust functionality, learn why our product stands out.",
-    authorName: "Erica Johns",
-  },
-  {
-    img: "https://picsum.photos/800/450?random=3",
-    title: "Designing for the future: trends and insights",
-    description:
-      "Stay ahead of the curve with the latest design trends and insights. Our design team shares their expertise on creating intuitive and visually stunning user experiences.",
-    authorName: "Kate Morrison",
-  },
-  {
-    img: "https://picsum.photos/800/450?random=4",
-    title: "Our company's journey: milestones and achievements",
-    description:
-      "Take a look at our company's journey and the milestones we've achieved along the way. From humble beginnings to industry leader, discover our story of growth and success.",
-    authorName: "Cindy Baker",
-  },
-  {
-    img: "https://picsum.photos/800/450?random=45",
-    title: "Pioneering sustainable engineering solutions",
-    description:
-      "Learn about our commitment to sustainability and the innovative engineering solutions we're implementing to create a greener future. Discover the impact of our eco-friendly initiatives.",
-    authorName: "Agnes Walker",
-  },
-  {
-    img: "https://picsum.photos/800/450?random=6",
-    title: "Maximizing efficiency with our latest product updates",
-    description:
-      "Our recent product updates are designed to help you maximize efficiency and achieve more. Get a detailed overview of the new features and improvements that can elevate your workflow.",
-    authorName: "Travis Howard",
-  },
-];
+interface BlogProps {
+  posts: PostResponseDTO[];
+}
 
-const SyledCard = styled(Card)(({ theme }) => ({
+const StyledCard = styled(Card)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   padding: 0,
@@ -78,7 +37,7 @@ const SyledCard = styled(Card)(({ theme }) => ({
   },
 }));
 
-const SyledCardContent = styled(CardContent)({
+const StyledCardContent = styled(CardContent)({
   display: "flex",
   flexDirection: "column",
   gap: 4,
@@ -89,7 +48,7 @@ const SyledCardContent = styled(CardContent)({
   },
 });
 
-const StyledTypography = styled(Typography)({
+const ClampedTypography = styled(Typography)({
   display: "-webkit-box",
   WebkitBoxOrient: "vertical",
   WebkitLineClamp: 2,
@@ -97,7 +56,18 @@ const StyledTypography = styled(Typography)({
   textOverflow: "ellipsis",
 });
 
-function Author({ authorName }: { authorName: string }) {
+interface AuthorProps {
+  authorName: string;
+  createdAt: string;
+}
+
+function Author({ authorName, createdAt }: AuthorProps): React.ReactNode {
+  const formattedDate = new Date(createdAt).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
   return (
     <Box
       sx={{
@@ -109,28 +79,30 @@ function Author({ authorName }: { authorName: string }) {
         padding: "16px",
       }}
     >
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          gap: 1,
-          alignItems: "center",
-        }}
-      >
-        <Typography variant="caption">{authorName}</Typography>
-      </Box>
-      <Typography variant="caption">July 14, 2021</Typography>
+      <Typography variant="caption">{authorName}</Typography>
+      <Typography variant="caption">{formattedDate}</Typography>
     </Box>
   );
 }
 
-export function Search() {
+interface SearchProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+function Search({ value, onChange }: SearchProps): React.ReactNode {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    onChange(e.target.value);
+  };
+
   return (
     <FormControl sx={{ width: { xs: "100%", md: "25ch" } }} variant="outlined">
       <OutlinedInput
         size="small"
         id="search"
-        placeholder="Search…"
+        placeholder="Search..."
+        value={value}
+        onChange={handleChange}
         sx={{ flexGrow: 1 }}
         startAdornment={
           <InputAdornment position="start" sx={{ color: "text.primary" }}>
@@ -145,21 +117,42 @@ export function Search() {
   );
 }
 
-export function Blog() {
-  const [focusedCardIndex, setFocusedCardIndex] = React.useState<number | null>(
-    null
-  );
+const PLACEHOLDER_IMAGES = [
+  "https://picsum.photos/800/450?random=1",
+  "https://picsum.photos/800/450?random=2",
+  "https://picsum.photos/800/450?random=3",
+  "https://picsum.photos/800/450?random=4",
+  "https://picsum.photos/800/450?random=5",
+  "https://picsum.photos/800/450?random=6",
+];
 
-  const handleFocus = (index: number) => {
+function getImageForIndex(index: number): string {
+  return (
+    PLACEHOLDER_IMAGES[index % PLACEHOLDER_IMAGES.length] ??
+    PLACEHOLDER_IMAGES[0]!
+  );
+}
+
+export function Blog({ posts }: BlogProps): React.ReactNode {
+  const [focusedCardIndex, setFocusedCardIndex] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
+  const filteredPosts = searchQuery
+    ? posts.filter(
+        (post) =>
+          post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          post.content.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : posts;
+
+  const topPosts = filteredPosts.slice(0, 6);
+
+  const handleFocus = (index: number): void => {
     setFocusedCardIndex(index);
   };
 
-  const handleBlur = () => {
+  const handleBlur = (): void => {
     setFocusedCardIndex(null);
-  };
-
-  const handleClick = () => {
-    console.info("You clicked the filter chip.");
   };
 
   return (
@@ -174,301 +167,91 @@ export function Blog() {
         <Typography variant="h1" gutterBottom>
           Blog
         </Typography>
-        <Typography>
-          Stay in the loop with the latest about our products
-        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            justifyContent: "space-between",
+            alignItems: { xs: "start", md: "center" },
+            gap: 2,
+          }}
+        >
+          <Typography>
+            Stay in the loop with the latest about our products
+          </Typography>
+          <Search value={searchQuery} onChange={setSearchQuery} />
+        </Box>
       </div>
-      <Box
-        sx={{
-          display: { xs: "flex", sm: "none" },
-          flexDirection: "row",
-          gap: 1,
-          width: { xs: "100%", md: "fit-content" },
-          overflow: "auto",
-        }}
-      >
-        <Search />
 
-        <IconButton size="small" aria-label="RSS feed">
-          <RssFeedRoundedIcon />
-        </IconButton>
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column-reverse", md: "row" },
-          width: "100%",
-          justifyContent: "space-between",
-          alignItems: { xs: "start", md: "center" },
-          gap: 4,
-          overflow: "auto",
-        }}
-      >
-        <Box
-          sx={{
-            display: "inline-flex",
-            flexDirection: "row",
-            gap: 3,
-            overflow: "auto",
-          }}
+      {topPosts.length === 0 ? (
+        <Typography
+          variant="body1"
+          color="text.secondary"
+          sx={{ py: 4, textAlign: "center" }}
         >
-          <Chip onClick={handleClick} size="medium" label="All categories" />
-          <Chip
-            onClick={handleClick}
-            size="medium"
-            label="Company"
-            sx={{
-              backgroundColor: "transparent",
-              border: "none",
-            }}
-          />
-          <Chip
-            onClick={handleClick}
-            size="medium"
-            label="Product"
-            sx={{
-              backgroundColor: "transparent",
-              border: "none",
-            }}
-          />
-          <Chip
-            onClick={handleClick}
-            size="medium"
-            label="Design"
-            sx={{
-              backgroundColor: "transparent",
-              border: "none",
-            }}
-          />
-          <Chip
-            onClick={handleClick}
-            size="medium"
-            label="Engineering"
-            sx={{
-              backgroundColor: "transparent",
-              border: "none",
-            }}
-          />
-        </Box>
-        <Box
-          sx={{
-            display: { xs: "none", sm: "flex" },
-            flexDirection: "row",
-            gap: 1,
-            width: { xs: "100%", md: "fit-content" },
-            overflow: "auto",
-          }}
-        >
-          <Search />
-        </Box>
-      </Box>
-      <Grid container spacing={2} columns={12}>
-        <Grid size={{ xs: 12, md: 6 }}>
-          <SyledCard
-            variant="outlined"
-            onFocus={() => handleFocus(0)}
-            onBlur={handleBlur}
-            tabIndex={0}
-            className={focusedCardIndex === 0 ? "Mui-focused" : ""}
-          >
-            <CardMedia
-              component="img"
-              alt="green iguana"
-              image={cardData[0].img}
-              sx={{
-                aspectRatio: "16 / 9",
-                borderBottom: "1px solid",
-                borderColor: "divider",
-              }}
-            />
-            <SyledCardContent>
-              <Typography gutterBottom variant="h6" component="div">
-                {cardData[0].title}
-              </Typography>
-              <StyledTypography
-                variant="body2"
-                color="text.secondary"
-                gutterBottom
-              >
-                {cardData[0].description}
-              </StyledTypography>
-            </SyledCardContent>
-            <Author authorName={cardData[0].authorName} />
-          </SyledCard>
-        </Grid>
-        <Grid size={{ xs: 12, md: 6 }}>
-          <SyledCard
-            variant="outlined"
-            onFocus={() => handleFocus(1)}
-            onBlur={handleBlur}
-            tabIndex={0}
-            className={focusedCardIndex === 1 ? "Mui-focused" : ""}
-          >
-            <CardMedia
-              component="img"
-              alt="green iguana"
-              image={cardData[1].img}
-              aspect-ratio="16 / 9"
-              sx={{
-                borderBottom: "1px solid",
-                borderColor: "divider",
-              }}
-            />
-            <SyledCardContent>
-              <Typography gutterBottom variant="h6" component="div">
-                {cardData[1].title}
-              </Typography>
-              <StyledTypography
-                variant="body2"
-                color="text.secondary"
-                gutterBottom
-              >
-                {cardData[1].description}
-              </StyledTypography>
-            </SyledCardContent>
-            <Author authorName={cardData[1].authorName} />
-          </SyledCard>
-        </Grid>
-        <Grid size={{ xs: 12, md: 4 }}>
-          <SyledCard
-            variant="outlined"
-            onFocus={() => handleFocus(2)}
-            onBlur={handleBlur}
-            tabIndex={0}
-            className={focusedCardIndex === 2 ? "Mui-focused" : ""}
-            sx={{ height: "100%" }}
-          >
-            <CardMedia
-              component="img"
-              alt="green iguana"
-              image={cardData[2].img}
-              sx={{
-                height: { sm: "auto", md: "50%" },
-                aspectRatio: { sm: "16 / 9", md: "" },
-              }}
-            />
-            <SyledCardContent>
-              <Typography gutterBottom variant="h6" component="div">
-                {cardData[2].title}
-              </Typography>
-              <StyledTypography
-                variant="body2"
-                color="text.secondary"
-                gutterBottom
-              >
-                {cardData[2].description}
-              </StyledTypography>
-            </SyledCardContent>
-            <Author authorName={cardData[2].authorName} />
-          </SyledCard>
-        </Grid>
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 2,
-              height: "100%",
-            }}
-          >
-            <SyledCard
-              variant="outlined"
-              onFocus={() => handleFocus(3)}
-              onBlur={handleBlur}
-              tabIndex={0}
-              className={focusedCardIndex === 3 ? "Mui-focused" : ""}
-              sx={{ height: "100%" }}
-            >
-              <SyledCardContent
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  height: "100%",
-                }}
-              >
-                <div>
-                  <Typography gutterBottom variant="h6" component="div">
-                    {cardData[3].title}
-                  </Typography>
-                  <StyledTypography
-                    variant="body2"
-                    color="text.secondary"
-                    gutterBottom
+          {searchQuery
+            ? "No posts found matching your search."
+            : "No posts yet. Be the first to write one!"}
+        </Typography>
+      ) : (
+        <Grid container spacing={2} columns={12}>
+          {topPosts.map((post, index) => {
+            const isLarge = index < 2;
+            const gridSize = isLarge ? { xs: 12, md: 6 } : { xs: 12, md: 4 };
+
+            return (
+              <Grid key={post.id} size={gridSize}>
+                <StyledCard
+                  variant="outlined"
+                  onFocus={() => handleFocus(index)}
+                  onBlur={handleBlur}
+                  tabIndex={0}
+                  className={focusedCardIndex === index ? "Mui-focused" : ""}
+                  sx={{ height: "100%" }}
+                >
+                  <CardActionArea
+                    component={Link}
+                    href={`/${post.id}`}
+                    sx={{
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "stretch",
+                    }}
                   >
-                    {cardData[3].description}
-                  </StyledTypography>
-                </div>
-              </SyledCardContent>
-              <Author authorName={cardData[3].authorName} />
-            </SyledCard>
-            <SyledCard
-              variant="outlined"
-              onFocus={() => handleFocus(4)}
-              onBlur={handleBlur}
-              tabIndex={0}
-              className={focusedCardIndex === 4 ? "Mui-focused" : ""}
-              sx={{ height: "100%" }}
-            >
-              <SyledCardContent
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  height: "100%",
-                }}
-              >
-                <div>
-                  <Typography gutterBottom variant="h6" component="div">
-                    {cardData[4].title}
-                  </Typography>
-                  <StyledTypography
-                    variant="body2"
-                    color="text.secondary"
-                    gutterBottom
-                  >
-                    {cardData[4].description}
-                  </StyledTypography>
-                </div>
-              </SyledCardContent>
-              <Author authorName={cardData[4].authorName} />
-            </SyledCard>
-          </Box>
+                    <CardMedia
+                      component="img"
+                      alt={post.title}
+                      image={getImageForIndex(index)}
+                      sx={{
+                        aspectRatio: "16 / 9",
+                        borderBottom: "1px solid",
+                        borderColor: "divider",
+                      }}
+                    />
+                    <StyledCardContent>
+                      <Typography gutterBottom variant="h6" component="div">
+                        {post.title}
+                      </Typography>
+                      <ClampedTypography
+                        variant="body2"
+                        color="text.secondary"
+                        gutterBottom
+                      >
+                        {post.content}
+                      </ClampedTypography>
+                    </StyledCardContent>
+                    <Author
+                      authorName={post.authorName}
+                      createdAt={post.createdAt}
+                    />
+                  </CardActionArea>
+                </StyledCard>
+              </Grid>
+            );
+          })}
         </Grid>
-        <Grid size={{ xs: 12, md: 4 }}>
-          <SyledCard
-            variant="outlined"
-            onFocus={() => handleFocus(5)}
-            onBlur={handleBlur}
-            tabIndex={0}
-            className={focusedCardIndex === 5 ? "Mui-focused" : ""}
-            sx={{ height: "100%" }}
-          >
-            <CardMedia
-              component="img"
-              alt="green iguana"
-              image={cardData[5].img}
-              sx={{
-                height: { sm: "auto", md: "50%" },
-                aspectRatio: { sm: "16 / 9", md: "" },
-              }}
-            />
-            <SyledCardContent>
-              <Typography gutterBottom variant="h6" component="div">
-                {cardData[5].title}
-              </Typography>
-              <StyledTypography
-                variant="body2"
-                color="text.secondary"
-                gutterBottom
-              >
-                {cardData[5].description}
-              </StyledTypography>
-            </SyledCardContent>
-            <Author authorName={cardData[5].authorName} />
-          </SyledCard>
-        </Grid>
-      </Grid>
+      )}
     </Box>
   );
 }

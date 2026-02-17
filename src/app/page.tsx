@@ -1,38 +1,27 @@
-"use client";
+import Container from "@mui/material/Container";
+import { Blog } from "@/components/Blog";
+import { Latest } from "@/components/Latest";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { getAllPosts } from "@/api/posts";
 
-import Link from "next/link";
-import { useEffect, useState } from "react";
+export const dynamic = "force-dynamic";
 
-export default function Home() {
-  const [message, setMessage] = useState<string>();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const res = await fetch("/api/hello");
-      const { message } = await res.json();
-      setMessage(message);
-    };
-    fetchData();
-  }, []);
+export default async function BlogPage(): Promise<React.ReactNode> {
+  const posts = await getAllPosts(true);
 
   return (
-    <section className="w-full py-12 md:py-24 lg:py-32 ">
-      <div className="flex flex-col items-center justify-center px-4 md:px-6 space-y-4">
-        <p className="max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
-          Here is the response to your API call:
-        </p>
-        <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-          {!message ? "Loading..." : message}
-        </h1>
-        <Link
-          href="/api/hello"
-          className="inline-flex h-9 items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 "
-          prefetch={false}
-        >
-          View the API call
-        </Link>
-        <Link href="/blog">Blog</Link>
-      </div>
-    </section>
+    <>
+      <Header />
+      <Container
+        maxWidth="lg"
+        component="main"
+        sx={{ display: "flex", flexDirection: "column", my: 14, gap: 4 }}
+      >
+        <Blog posts={posts} />
+        <Latest posts={posts} />
+      </Container>
+      <Footer />
+    </>
   );
 }
