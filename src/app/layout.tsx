@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import { ThemeProvider } from "@mui/material";
 import { roboto } from "../styles/fonts";
 import { theme } from "@/styles/theme";
