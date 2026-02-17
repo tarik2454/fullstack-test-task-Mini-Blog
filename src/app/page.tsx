@@ -4,11 +4,17 @@ import { Latest } from "@/components/Latest";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { getAllPosts } from "@/api/posts";
+import type { PostResponseDTO } from "@/api/posts";
 
 export const dynamic = "force-dynamic";
 
 export default async function BlogPage(): Promise<React.ReactNode> {
-  const posts = await getAllPosts(true);
+  let posts: PostResponseDTO[] = [];
+  try {
+    posts = await getAllPosts(true);
+  } catch (error) {
+    console.error("Failed to fetch posts:", error);
+  }
 
   return (
     <>
